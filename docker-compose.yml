@@ -1,0 +1,24 @@
+services:
+  marvis2api:
+    build: .
+    image: ${MV2A_IMAGE:-marvis2api-panel:local}
+    container_name: marvis2api
+    restart: unless-stopped
+    ports:
+      - "${MV2A_BIND:-127.0.0.1}:${MV2A_PORT:-18620}:18620"
+    environment:
+      - TZ=Asia/Shanghai
+      - MV2A_PREPARE_FILE=/run/secrets/marvis.json
+    volumes:
+      # 账号、面板密码、API Key、运行状态与用量。
+      - marvis2api-data:/app/data
+      # 先运行 prepare.sh；不存在时直接报错，不自动创建空目录。
+      - type: bind
+        source: ${MV2A_PREPARE_FILE:-./.prepare/marvis.json}
+        target: /run/secrets/marvis.json
+        read_only: true
+        bind:
+          create_host_path: false
+
+volumes:
+  marvis2api-data:

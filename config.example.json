@@ -1,0 +1,42 @@
+{
+  "listen": ":18620",
+  "auth_file": "./data/auth.json",
+  "state_file": "./data/state.json",
+  "max_in_flight": 3,
+
+  "upstream": {
+    "base_url": "https://yybadaccess.3g.qq.com",
+    "chat_path": "/v1/chat/completions",
+    "models_path": "",
+    "quota_path": "",
+    "refresh_path": "",
+    "timeout_seconds": 120,
+    "header_timeout_seconds": 120,
+    "idle_timeout_seconds": 300,
+    "models_timeout_seconds": 15,
+    "user_agent": ""
+  },
+
+  "cooldown": {
+    "soft_rate": "600s",
+    "soft_rate_max": "2h",
+    "not_found": "60s",
+    "auth_dead": "24h",
+    "breaker_threshold": 3,
+    "breaker_cooldown": "30m",
+    "breaker_cooldown_max": "6h"
+  },
+
+  "schedule": {
+    "quota_refresh_minutes": 5,
+    "quota_refresh_enabled": true,
+    "keepalive_hours": [22],
+    "keepalive_enabled": true,
+    "probe_interval_seconds": 0,
+    "probe_enabled": false
+  },
+
+  "features": {
+    "sanitize_fingerprints": true
+  }
+}

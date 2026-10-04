@@ -1,0 +1,94 @@
+#define _DARWIN_C_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/syscall.h>
+#include <sys/un.h>
+#include <unistd.h>
+
+/* 官方 MarvisHost 把两处 Unix socket 写死在二进制里。
+   不改签名过的二进制，只在 connect/bind/unlink 时把路径换成这个账号自己的。
+   这样不会占用正在运行的 Marvis 的套接字。 */
+
+static FILE *logf;
+static void logl(const char *s) {
+    if (!logf) {
+        const char *p = getenv("MARVIS_IPC_HOOK_LOG");
+        if (!p || !p[0]) return;
+        logf = fopen(p, "a");
+        if (logf) setvbuf(logf, NULL, _IONBF, 0);
+    }
+    if (logf) fprintf(logf, "%s\n", s);
+}
+__attribute__((constructor)) static void onload(void) { logl("loaded"); }
+
+static const char *mapped(const char *path) {
+    if (!path) return NULL;
+    if (strcmp(path, "/tmp/marvisagent_k9Xm2P7vB4nQ8wLY") == 0)
+        return getenv("MARVIS_AGENT_IPC_PATH");
+    if (strcmp(path, "/tmp/marvisgateway_kb") == 0)
+        return getenv("MARVIS_KB_IPC_PATH");
+    return NULL;
+}
+
+static int rewrite(struct sockaddr_un *un) {
+    const char *to = mapped(un->sun_path);
+    if (!to || !to[0]) return 0;
+    char buf[180];
+    snprintf(buf, sizeof(buf), "rewrite %s -> %s", un->sun_path, to);
+    logl(buf);
+    memset(un->sun_path, 0, sizeof(un->sun_path));
+    strncpy(un->sun_path, to, sizeof(un->sun_path) - 1);
+    return 1;
+}
+
+int my_connect(int fd, const struct sockaddr *addr, socklen_t len) {
+    if (addr && addr->sa_family == AF_UNIX) {
+        struct sockaddr_un copy;
+        memset(&copy, 0, sizeof(copy));
+        memcpy(&copy, addr, len < sizeof(copy) ? len : sizeof(copy));
+        if (rewrite(&copy))
+            return (int)syscall(SYS_connect, fd, &copy, (socklen_t)sizeof(copy));
+    }
+    return (int)syscall(SYS_connect, fd, addr, len);
+}
+int my_bind(int fd, const struct sockaddr *addr, socklen_t len) {
+    if (addr && addr->sa_family == AF_UNIX) {
+        struct sockaddr_un copy;
+        memset(&copy, 0, sizeof(copy));
+        memcpy(&copy, addr, len < sizeof(copy) ? len : sizeof(copy));
+        if (rewrite(&copy))
+            return (int)syscall(SYS_bind, fd, &copy, (socklen_t)sizeof(copy));
+    }
+    return (int)syscall(SYS_bind, fd, addr, len);
+}
+int my_unlink(const char *path) {
+    const char *to = mapped(path);
+    if (to && to[0]) {
+        char buf[180];
+        snprintf(buf, sizeof(buf), "unlink %s -> %s", path, to);
+        logl(buf);
+        return (int)syscall(SYS_unlink, to);
+    }
+    return (int)syscall(SYS_unlink, path);
+}
+int my_unlinkat(int fd, const char *path, int flag) {
+    const char *to = mapped(path);
+    if (to && to[0]) {
+        char buf[180];
+        snprintf(buf, sizeof(buf), "unlinkat %s -> %s", path, to);
+        logl(buf);
+        return (int)syscall(SYS_unlinkat, fd, to, flag);
+    }
+    return (int)syscall(SYS_unlinkat, fd, path, flag);
+}
+
+#define DYLD_INTERPOSE(_repl, _orig) \
+    __attribute__((used)) static struct { const void *repl; const void *orig; } \
+    _interpose_##_orig __attribute__((section("__DATA,__interpose"))) = { \
+        (const void *)(unsigned long)&_repl, (const void *)(unsigned long)&_orig };
+DYLD_INTERPOSE(my_connect, connect)
+DYLD_INTERPOSE(my_bind, bind)
+DYLD_INTERPOSE(my_unlink, unlink)
+DYLD_INTERPOSE(my_unlinkat, unlinkat)

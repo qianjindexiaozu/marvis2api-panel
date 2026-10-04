@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+# Allow only these explicit synthetic signing fixtures, not whole test files.
+[allowlist]
+description = "Known fake signing credentials used in unit tests"
+regexTarget = "secret"
+regexes = [
+  '''^(test-secret-never-in-errors|test-wallet-key|test-panel-signing-key|test-scheduler-key|test-key|other-test-key|fixture-signing-key|fixture-upstream-signing-key|fixture-oauth-signing-key|fixture-panel-signing-key|different-fixture-key)$''',
+]

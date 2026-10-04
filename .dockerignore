@@ -1,0 +1,25 @@
+# Only ship the files needed to build and run the gateway.
+**
+!go.mod
+!go.sum
+!LICENSE
+!config.example.json
+!cmd/
+!cmd/**/
+!cmd/**/*.go
+!internal/
+!internal/**/
+!internal/**/*.go
+!internal/panel/index.html
+!internal/panel/app.js
+!internal/kernel/redirect_src.txt
+!docker/
+!docker/entrypoint.sh
+
+# Tests and private deployment files must never enter build layers.
+**/*_test.go
+.prepare/
+data/
+.env
+.env.*
+config.json
