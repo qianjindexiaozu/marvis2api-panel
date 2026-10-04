@@ -25,6 +25,7 @@ go vet ./...
 go test -race ./...
 for script in scripts/*.sh; do bash -n "$script"; done
 sh -n docker/entrypoint.sh
+python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
 ```
 
 Default tests use synthetic credentials and local mock services. They do not need a real prepare file, account, or App. The optional QQ network test is opt-in:
