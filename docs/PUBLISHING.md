@@ -66,10 +66,12 @@ docker build -t marvis2api-panel:local .
 镜像地址为：
 
 ```text
-ghcr.io/qianjindexiaozu/marvis2api-panel
+ghcr.io/qianjindexiaozu/marvis2api-panel-runtime
 ```
 
 首次发布后检查包与仓库的关联、访问权限和可见性。GitHub 仓库公开不保证已有 GHCR 包自动公开；需要在包设置中确认。
+
+旧的 `marvis2api-panel` 镜像包已停用；早期默认构建证明包含推送事件邮箱。当前使用新的 `marvis2api-panel-runtime` 包，关闭事件元数据构建证明和构建记录上传。
 
 ## 版本发布
 

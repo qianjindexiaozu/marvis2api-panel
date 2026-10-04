@@ -75,7 +75,7 @@ docker compose logs --tail 50
 首次 GitHub Actions 发布成功，且 GHCR 包设为公开之后，才可以拉取：
 
 ```bash
-export MV2A_IMAGE=ghcr.io/qianjindexiaozu/marvis2api-panel:latest
+export MV2A_IMAGE=ghcr.io/qianjindexiaozu/marvis2api-panel-runtime:latest
 docker compose pull
 docker compose up -d --no-build
 ```
