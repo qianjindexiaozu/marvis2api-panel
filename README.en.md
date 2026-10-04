@@ -11,15 +11,15 @@ A self-hosted gateway exposing Tencent Marvis accounts as an OpenAI-compatible A
 
 ## Requirements
 
-- Docker Engine / Docker Desktop and Docker Compose v2 or newer.
-- Bash and Python 3 on the host; preparation uses only the Python standard library.
-- Official client files and a registered device id for initial preparation. macOS extraction is supported; Linux can import an existing file.
+- macOS, Docker Desktop, and Docker Compose v2 or newer.
+- Bash and Python 3 on the Mac; preparation uses only the Python standard library.
+- Official Marvis for macOS installed and run to complete device registration.
 
-Source, binaries, and images do not embed the upstream signing key or account credentials. **This project cannot automatically register a device or work without configuration on a blank Linux system.** Once prepared, Docker runtime does not require the App.
+Source, binaries, and images do not embed the upstream signing key or account credentials. **Only macOS initialization and deployment are currently supported; standalone Linux deployment is not supported.** Initial preparation needs local official client data. Once prepared, Docker runtime does not require the App.
 
 ## Quick start
 
-### macOS
+### macOS + Docker
 
 Install and run official Marvis first to register the device:
 
@@ -30,16 +30,7 @@ bash scripts/prepare.sh
 docker compose up -d --build
 ```
 
-### Linux
-
-Clone the repository and securely transfer the private file prepared on your Mac:
-
-```bash
-bash scripts/prepare.sh --import /private/path/marvis.json
-docker compose up -d --build
-```
-
-Both modes create `.prepare/marvis.json`, mounted read-only in the container. The script does not print signing or device values, or read account tokens, Cookies, or the keychain. See the [deployment guide](docs/DEPLOYMENT.md) for sources, permissions, and updates.
+The script creates `.prepare/marvis.json`, mounted read-only in the container. The script does not print signing or device values, or read account tokens, Cookies, or the keychain. See the [deployment guide](docs/DEPLOYMENT.md) for sources, permissions, and updates.
 
 Open <http://127.0.0.1:18620/panel/>. Default password: `marvis`.
 
@@ -97,10 +88,10 @@ Do not use `chmod 777` on credential files or data directories. See the [deploym
 
 ## Supported modes
 
-- Docker: Linux `amd64` / `arm64`, using upstream HTTP only, not official kernels.
-- Native binaries: Linux / macOS `amd64` / `arm64`. Source requires Go 1.22+; use the current stable toolchain when possible.
+- Docker Desktop on macOS: internally uses Linux `amd64` / `arm64` images and upstream HTTP, not official kernels. This does not imply standalone initialization support on a Linux host.
+- Native binaries: macOS `amd64` / `arm64`. Source requires Go 1.22+; use the current stable toolchain when possible.
 - Official macOS kernel: optional experimental mode requiring official Host / Agent components and Xcode Command Line Tools. Official components are macOS arm64 and cannot run in Linux containers.
-- No native Windows binary or PowerShell preparation script yet.
+- No native Linux / Windows binaries or standalone initialization flows yet.
 - WeChat display names are not guaranteed; QQ login sometimes provides one.
 
 ## Development and releases

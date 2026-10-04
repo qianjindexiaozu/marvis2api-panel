@@ -11,15 +11,15 @@
 
 ## 使用条件
 
-- Docker Engine / Docker Desktop，以及 Docker Compose v2 或更新版本。
-- 宿主机有 Bash 和 Python 3；准备脚本只使用 Python 标准库。
-- 首次准备数据需要官方客户端文件和已经注册的设备号。目前支持在 macOS 上自动读取；Linux 可以导入已有文件。
+- macOS、Docker Desktop，以及 Docker Compose v2 或更新版本。
+- 本机有 Bash 和 Python 3；准备脚本只使用 Python 标准库。
+- 已安装并运行 macOS 官方 Marvis 客户端，完成设备注册。
 
-源码、二进制和镜像不内置上游签名钥匙，也不包含账号凭证。**这不是一个能在空白 Linux 环境里自动注册设备、零配置使用的项目。** 准备好数据后，Docker 运行不需要 App 本体。
+源码、二进制和镜像不内置上游签名钥匙，也不包含账号凭证。**目前仅提供 macOS 初始化和部署流程，不支持 Linux 独立部署。** 首次准备需要本机官方客户端数据；准备好后，Docker 运行不需要 App 本体。
 
 ## 快速开始
 
-### macOS
+### macOS + Docker
 
 先安装并运行官方 Marvis，完成设备注册：
 
@@ -30,16 +30,7 @@ bash scripts/prepare.sh
 docker compose up -d --build
 ```
 
-### Linux
-
-先克隆仓库，将你在 Mac 上准备的私有文件安全传到 Linux，再执行：
-
-```bash
-bash scripts/prepare.sh --import /private/path/marvis.json
-docker compose up -d --build
-```
-
-两种方式都生成 `.prepare/marvis.json`，容器只读挂载它。脚本不打印钥匙或设备号，也不读取账号 token、Cookie 或钥匙串。详细的文件来源、权限与更新方法见[部署说明](docs/DEPLOYMENT.md)。
+脚本生成 `.prepare/marvis.json`，容器只读挂载它。脚本不打印钥匙或设备号，也不读取账号 token、Cookie 或钥匙串。详细的文件来源、权限与更新方法见[部署说明](docs/DEPLOYMENT.md)。
 
 打开 <http://127.0.0.1:18620/panel/>，默认密码为 `marvis`：
 
@@ -97,10 +88,10 @@ curl -N http://127.0.0.1:18620/v1/chat/completions \
 
 ## 支持范围
 
-- Docker：Linux `amd64` / `arm64`，聊天走上游 HTTP，不运行官方内核。
-- 原生程序：Linux / macOS `amd64` / `arm64`。本机编译要求 Go 1.22+，建议使用当前稳定版。
+- Docker Desktop（macOS）：镜像内部使用 Linux `amd64` / `arm64`，聊天走上游 HTTP，不运行官方内核；这不代表支持 Linux 宿主机独立初始化。
+- 原生程序：macOS `amd64` / `arm64`。本机编译要求 Go 1.22+，建议使用当前稳定版。
 - macOS 官方内核：可选实验功能，需要官方 Host / Agent 组件和 Xcode Command Line Tools。官方组件为 macOS arm64，不能放进 Linux 容器运行。
-- 暂不提供 Windows 原生程序或 PowerShell 初始化脚本。
+- 暂不提供 Linux / Windows 原生程序或独立初始化流程。
 - 不保证微信昵称可用；QQ 扫码有时可从登录页取得昵称。
 
 ## 开发与发布

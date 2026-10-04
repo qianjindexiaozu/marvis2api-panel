@@ -52,12 +52,12 @@ docker build -t marvis2api-panel:local .
 
 | 事件 | 行为 |
 |---|---|
-| Pull request | 扫描 Git 历史中的秘密，格式 / vet / race 测试，四个平台的交叉编译和双架构 Docker 构建；不推送镜像 |
+| Pull request | 扫描 Git 历史中的秘密，格式 / vet / race 测试，macOS 两种架构的交叉编译和双架构 Docker 构建；不推送镜像 |
 | 推送 `main` | 检查通过后推送 GHCR 的 `latest` 与提交 SHA 标签 |
 | 推送 `v*` 标签 | 检查通过后推送版本镜像，并创建包含二进制、MIT 许可证和 SHA-256 校验文件的 GitHub Release |
 | 手工触发 | 检查与构建，上传二进制 artifact；普通分支不推送镜像或创建 Release |
 
-原生构建目标为 Linux / macOS 的 `amd64`、`arm64`；暂不发布 Windows `.exe`。Docker 目标为 Linux `amd64` / `arm64`。
+原生构建目标仅为 macOS 的 `amd64`、`arm64`；暂不发布 Linux / Windows 原生程序。Docker Desktop 使用的镜像仍构建 Linux `amd64` / `arm64`，但不承诺 Linux 宿主机独立初始化或部署。
 
 工作流默认只有仓库读取权限，只有镜像任务申请 `packages: write`，Release 任务申请 `contents: write`。标准部署不需要给 CI 添加真实钥匙、账号 token 或 prepare 文件。
 
@@ -86,7 +86,7 @@ git push origin v0.1.0
 
 发布后检查：
 
-- [ ] GitHub Actions 全部成功，Release 附件包含四个二进制、`LICENSE` 与 `checksums.txt`。
+- [ ] GitHub Actions 全部成功，Release 附件仅包含两个 macOS 二进制、`LICENSE` 与 `checksums.txt`。
 - [ ] GHCR 版本镜像能被匿名拉取，具有 Linux 两种架构。
 - [ ] 新镜像中没有 prepare 文件、账号数据或真实签名值；无 prepare 文件时应拒绝启动。
 - [ ] 从干净数据卷部署并测试实际账号登录、配额、token 刷新与流式聊天。

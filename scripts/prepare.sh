@@ -21,7 +21,7 @@ import tempfile
 
 root = Path(sys.argv[1])
 parser = argparse.ArgumentParser(description="为 Docker 准备签名钥匙和已注册设备号；不导出账号 token。")
-parser.add_argument("--import", dest="import_file", type=Path, help="导入已有的 prepare JSON（适用于 Linux）")
+parser.add_argument("--import", dest="import_file", type=Path, help="恢复已有的私有 prepare JSON；不注册设备")
 parser.add_argument("--client-dir", type=Path, help="客户端数据目录，包含 OfflinePack 和 device-info.cache")
 parser.add_argument("--app-dir", type=Path, default=Path("/Applications/Marvis.app"), help="官方 App 目录，作为离线包备用来源")
 parser.add_argument("--output", type=Path, default=root / ".prepare/marvis.json", help="输出文件；父目录必须为当前用户私有")
@@ -59,7 +59,7 @@ def extract_data():
     client_dir = args.client_dir
     if client_dir is None:
         if sys.platform != "darwin":
-            raise ValueError("Linux 请用 --import 导入已有 prepare 文件，或用 --client-dir 指定已有客户端数据；不能自动注册设备号")
+            raise ValueError("当前仅支持 macOS 官方客户端自动准备；不支持其他平台独立初始化或自动注册设备号")
         client_dir = Path.home() / "Library/Application Support/com.tencent.mac.marvis"
     client_dir = client_dir.expanduser()
     sources = [client_dir / "OfflinePack/main/current/assets", args.app_dir.expanduser() / "Contents/Resources/offline-pack/main/assets"]

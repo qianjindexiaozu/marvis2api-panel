@@ -39,11 +39,11 @@ That test contacts the real QQ login service and may fail or skip depending on u
 
 ```bash
 go build -o marvis2api ./cmd/server
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /tmp/marvis2api-linux ./cmd/server
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o /tmp/marvis2api-darwin-amd64 ./cmd/server
 docker build -t marvis2api-panel:local .
 ```
 
-Release builds inject the version using `-ldflags="-X main.appVersion=<version>"`; local builds report `dev`. Native Windows builds are not currently supported. The Docker image builds Linux `amd64` and `arm64`.
+Release builds inject the version using `-ldflags="-X main.appVersion=<version>"`; local builds report `dev`. Native releases target macOS `amd64` and `arm64` only. Linux / Windows native deployment and standalone initialization are not currently supported. Docker Desktop on macOS uses Linux `amd64` and `arm64` images internally; these images do not remove the macOS client requirement for initial preparation.
 
 ## Pull requests
 

@@ -2,6 +2,8 @@
 
 [返回 README](../README.md)
 
+当前部署流程仅面向 macOS：先从本机官方客户端准备数据，再使用 Docker Desktop 或 macOS 原生程序运行。不提供 Linux / Windows 独立初始化或原生安装方案。
+
 ## 准备文件
 
 `scripts/prepare.sh` 使用 Bash 和 Python 3，将 `access_key` 与 `qimei36` 写入 `.prepare/marvis.json`。没有内置钥匙，不导出账号 token，不修改官方客户端。
@@ -21,21 +23,23 @@ bash scripts/prepare.sh
 
 设备号来自 `~/Library/Application Support/com.tencent.mac.marvis/device-info.cache`。需要官方客户端已经完成注册；随机 UUID 或扫码登录的 guid 不能代替它。
 
-### Linux 导入
+### 自定义路径与恢复备份
 
-先通过安全渠道将准备文件传入一个私有目录：
-
-```bash
-bash scripts/prepare.sh --import /private/path/marvis.json
-```
-
-已有客户端文件时，也可直接提取：
+macOS 客户端数据不在默认位置时，可以指定：
 
 ```bash
 bash scripts/prepare.sh --client-dir /private/client-data
 ```
 
-该目录需包含 `OfflinePack/main/current/assets/` 和 `device-info.cache`。可以用 `--app-dir` 指定备用 App 目录，用 `--output` 指定输出文件。Linux 本身不会自动安装 macOS App 或注册设备。
+该目录需包含 `OfflinePack/main/current/assets/` 和 `device-info.cache`。可以用 `--app-dir` 指定备用 App 目录，用 `--output` 指定输出文件。
+
+已有私有 prepare 备份时，可以恢复：
+
+```bash
+bash scripts/prepare.sh --import /private/backup/marvis.json
+```
+
+`--import` 只校验并复制已有数据，不注册设备，也不是其他平台的独立初始化方案。
 
 ### 权限与更新
 
@@ -76,14 +80,14 @@ docker compose pull
 docker compose up -d --no-build
 ```
 
-生产部署建议使用具体版本，例如 `:0.1.0`，不要假定示例版本已经发布。启动前仍需先运行 prepare 脚本。
+部署时建议固定到实际发布的版本标签，不要假定示例版本已经发布，也不要把预发布版本当作生产稳定版。启动前仍需在 Mac 上运行 prepare 脚本。
 
 ### 远程访问
 
-优先保持端口只绑定本机，通过 SSH 转发访问：
+远程访问部署服务的 Mac 时，优先保持端口只绑定本机，通过 SSH 转发访问：
 
 ```bash
-ssh -L 18620:127.0.0.1:18620 <user>@<server>
+ssh -L 18620:127.0.0.1:18620 <user>@<mac-host>
 ```
 
 需要对外开放时，先修改默认密码、配置 HTTPS 反向代理和访问控制，再按需设置 `MV2A_BIND`。上游 token 和 API Key 不应通过公网明文 HTTP 传输。
@@ -98,7 +102,7 @@ docker compose down
 
 prepare 文件不在数据卷里，需要独立备份。数据卷备份含完整账号凭证和 API Key，应限制访问并加密保存；不要上传公共网盘或 GitHub。
 
-## 本机程序
+## macOS 本机程序
 
 需要 Go 1.22+，推荐当前稳定版。先准备数据，再构建运行：
 
