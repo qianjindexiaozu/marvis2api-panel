@@ -89,5 +89,6 @@ git push origin v0.1.0
 - [ ] GitHub Actions 全部成功，Release 附件仅包含两个 macOS 二进制、`LICENSE` 与 `checksums.txt`。
 - [ ] GHCR 版本镜像能被匿名拉取，具有 Linux 两种架构。
 - [ ] 新镜像中没有 prepare 文件、账号数据或真实签名值；无 prepare 文件时应拒绝启动。
+- [ ] CI 日志、构建记录、镜像配置和构建证明元数据没有私人邮箱或其他敏感事件信息；不能只检查镜像文件系统。
 - [ ] 从干净数据卷部署并测试实际账号登录、配额、token 刷新与流式聊天。
 - [ ] 文档、镜像标签、Release 版本一致；用户知道首次准备仍依赖官方客户端数据。

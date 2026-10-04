@@ -10,6 +10,8 @@ Do not commit, publish, or paste any of the following into issues or logs:
 
 `.gitignore` excludes normal runtime paths. Docker uses an allowlisted build context and loads the prepare file only through a read-only runtime mount. Neither rule protects a file forcibly added to Git or exported to another location. Review staged changes and history before making a repository public.
 
+CI masks and removes email fields from the event payload before Docker actions run. Automatic Docker build-record uploads and provenance attestations are disabled because they can include event metadata such as private push-account emails. Check Actions logs, build records, image configuration, and attestation metadata as well as the image filesystem when reviewing a release.
+
 The prepare directory is `0700`; the file is `0644` so a non-root container UID can read its single-file mount. Host root and Docker administrators can still access it. Do not copy it into a shared directory. Runtime data is not encrypted by this project; secure backups separately.
 
 ## Deployment

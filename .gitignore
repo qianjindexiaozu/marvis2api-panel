@@ -42,6 +42,8 @@ Cookies
 *.bak
 *.log
 coverage.out
+__pycache__/
+*.pyc
 
 # Editor and OS metadata
 .DS_Store
